@@ -270,10 +270,10 @@ class DomainFuzz():
 		filtered = []
 
 		for d in self.domains:
-			#if not self.__validate_domain(d['domain-name']):
-				#p_err("debug: invalid domain %s\n" % d['domain-name'])
-			if self.__validate_domain(d['domain-name']) and d['domain-name'] not in seen:
-				seen.add(d['domain-name'])
+			#if not self.__validate_domain(d['domainname']):
+				#p_err("debug: invalid domain %s\n" % d['domainname'])
+			if self.__validate_domain(d['domainname']) and d['domainname'] not in seen:
+				seen.add(d['domainname'])
 				filtered.append(d)
 
 		self.domains = filtered
@@ -447,38 +447,38 @@ class DomainFuzz():
 		return result
 
 	def generate(self):
-		self.domains.append({ 'fuzzer': 'Original*', 'domain-name': self.domain + '.' + self.tld })
+		self.domains.append({ 'fuzzer': 'Original*', 'domainname': self.domain + '.' + self.tld })
 
 		for domain in self.__addition():
-			self.domains.append({ 'fuzzer': 'Addition', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Addition', 'domainname': domain + '.' + self.tld })
 		for domain in self.__bitsquatting():
-			self.domains.append({ 'fuzzer': 'Bitsquatting', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Bitsquatting', 'domainname': domain + '.' + self.tld })
 		for domain in self.__homoglyph():
-			self.domains.append({ 'fuzzer': 'Homoglyph', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Homoglyph', 'domainname': domain + '.' + self.tld })
 		for domain in self.__hyphenation():
-			self.domains.append({ 'fuzzer': 'Hyphenation', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Hyphenation', 'domainname': domain + '.' + self.tld })
 		for domain in self.__insertion():
-			self.domains.append({ 'fuzzer': 'Insertion', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Insertion', 'domainname': domain + '.' + self.tld })
 		for domain in self.__omission():
-			self.domains.append({ 'fuzzer': 'Omission', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Omission', 'domainname': domain + '.' + self.tld })
 		for domain in self.__repetition():
-			self.domains.append({ 'fuzzer': 'Repetition', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Repetition', 'domainname': domain + '.' + self.tld })
 		for domain in self.__replacement():
-			self.domains.append({ 'fuzzer': 'Replacement', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Replacement', 'domainname': domain + '.' + self.tld })
 		for domain in self.__subdomain():
-			self.domains.append({ 'fuzzer': 'Subdomain', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Subdomain', 'domainname': domain + '.' + self.tld })
 		for domain in self.__transposition():
-			self.domains.append({ 'fuzzer': 'Transposition', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Transposition', 'domainname': domain + '.' + self.tld })
 		for domain in self.__vowel_swap():
-			self.domains.append({ 'fuzzer': 'Vowel-swap', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Vowel-swap', 'domainname': domain + '.' + self.tld })
 
 		if '.' in self.tld:
-			self.domains.append({ 'fuzzer': 'Various', 'domain-name': self.domain + '.' + self.tld.split('.')[-1] })
-			self.domains.append({ 'fuzzer': 'Various', 'domain-name': self.domain + self.tld })
+			self.domains.append({ 'fuzzer': 'Various', 'domainname': self.domain + '.' + self.tld.split('.')[-1] })
+			self.domains.append({ 'fuzzer': 'Various', 'domainname': self.domain + self.tld })
 		if '.' not in self.tld:
-			self.domains.append({ 'fuzzer': 'Various', 'domain-name': self.domain + self.tld + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Various', 'domainname': self.domain + self.tld + '.' + self.tld })
 		if self.tld != 'com' and '.' not in self.tld:
-			self.domains.append({ 'fuzzer': 'Various', 'domain-name': self.domain + '-' + self.tld + '.com' })
+			self.domains.append({ 'fuzzer': 'Various', 'domainname': self.domain + '-' + self.tld + '.com' })
 
 		self.__filter_domains()
 
@@ -518,7 +518,7 @@ class DomainDict(DomainFuzz):
 
 	def generate(self):
 		for domain in self.__dictionary():
-			self.domains.append({ 'fuzzer': 'Dictionary', 'domain-name': domain + '.' + self.tld })
+			self.domains.append({ 'fuzzer': 'Dictionary', 'domainname': domain + '.' + self.tld })
 
 
 class DomainThread(threading.Thread):
@@ -601,7 +601,7 @@ class DomainThread(threading.Thread):
 		while not self.kill_received:
 			domain = self.jobs.get()
 
-			domain['domain-name'] = domain['domain-name'].encode('idna')
+			domain['domainname'] = domain['domainname'].encode('idna')
 
 			if self.option_extdns:
 				resolv = dns.resolver.Resolver()
@@ -612,28 +612,28 @@ class DomainThread(threading.Thread):
 				if args.port:
 					resolv.port = args.port
 				try:
-					domain['dns-ns'] = self.answer_to_list(resolv.query(domain['domain-name'], 'NS'))
+					domain['dns-ns'] = self.answer_to_list(resolv.query(domain['domainname'], 'NS'))
 				except DNSException:
 					pass
 
-				if 'dns-ns' in domain or len(domain['domain-name'].split('.')) > 1:
+				if 'dns-ns' in domain or len(domain['domainname'].split('.')) > 1:
 					try:
-						domain['dns-a'] = self.answer_to_list(resolv.query(domain['domain-name'], 'A'))
+						domain['dns-a'] = self.answer_to_list(resolv.query(domain['domainname'], 'A'))
 					except DNSException:
 						pass
 
 					try:
-						domain['dns-aaaa'] = self.answer_to_list(resolv.query(domain['domain-name'], 'AAAA'))
+						domain['dns-aaaa'] = self.answer_to_list(resolv.query(domain['domainname'], 'AAAA'))
 					except DNSException:
 						pass
 
 					try:
-						domain['dns-mx'] = self.answer_to_list(resolv.query(domain['domain-name'], 'MX'))
+						domain['dns-mx'] = self.answer_to_list(resolv.query(domain['domainname'], 'MX'))
 					except DNSException:
 						pass
 			else:
 				try:
-					ip = socket.getaddrinfo(domain['domain-name'], 80)
+					ip = socket.getaddrinfo(domain['domainname'], 80)
 				except Exception:
 					pass
 				else:
@@ -649,14 +649,14 @@ class DomainThread(threading.Thread):
 
 			if self.option_mxcheck:
 				if 'dns-mx' in domain:
-					if domain['domain-name'] is not self.domain_orig:
-						if self.__mxcheck(domain['dns-mx'][0], self.domain_orig, domain['domain-name']):
+					if domain['domainname'] is not self.domain_orig:
+						if self.__mxcheck(domain['dns-mx'][0], self.domain_orig, domain['domainname']):
 							domain['mx-spy'] = True
 
 			if self.option_whois:
 				if 'dns-ns' in domain or 'dns-a' in domain:
 					try:
-						whoisdb = whois.query(domain['domain-name'])
+						whoisdb = whois.query(domain['domainname'])
 						domain['whois-created'] = str(whoisdb.creation_date).split(' ')[0]
 						domain['whois-updated'] = str(whoisdb.last_updated).split(' ')[0]
 					except Exception:
@@ -675,7 +675,7 @@ class DomainThread(threading.Thread):
 
 			if self.option_banners:
 				if 'dns-a' in domain:
-					banner = self.__banner_http(domain['dns-a'][0], domain['domain-name'])
+					banner = self.__banner_http(domain['dns-a'][0], domain['domainname'])
 					if banner:
 						domain['banner-http'] = banner
 				if 'dns-mx' in domain:
@@ -686,7 +686,7 @@ class DomainThread(threading.Thread):
 			if self.option_ssdeep:
 				if 'dns-a' in domain:
 					try:
-						req = requests.get(self.uri_scheme + '://' + domain['domain-name'] + self.uri_path + self.uri_query, timeout=REQUEST_TIMEOUT_HTTP, headers={'User-Agent': 'Mozilla/5.0 (dnstwist)'})
+						req = requests.get(self.uri_scheme + '://' + domain['domainname'] + self.uri_path + self.uri_query, timeout=REQUEST_TIMEOUT_HTTP, headers={'User-Agent': 'Mozilla/5.0 (dnstwist)'})
 						#ssdeep_fuzz = ssdeep.hash(req.text.replace(' ', '').replace('\n', ''))
 						ssdeep_fuzz = ssdeep.hash(req.text)
 					except Exception:
@@ -695,7 +695,7 @@ class DomainThread(threading.Thread):
 						if req.status_code / 100 == 2:
 							domain['ssdeep-score'] = ssdeep.compare(self.ssdeep_orig, ssdeep_fuzz)
 
-			domain['domain-name'] = domain['domain-name'].decode('idna')
+			domain['domainname'] = domain['domainname'].decode('idna')
 
 			self.jobs.task_done()
 
@@ -713,18 +713,18 @@ def one_or_all(answers):
 def generate_json(domains):
 	json_domains = domains
 	for domain in json_domains:
-		domain['domain-name'] = domain['domain-name'].lower().encode('idna')
+		domain['domainname'] = domain['domainname'].lower().encode('idna')
 		domain['fuzzer'] = domain['fuzzer'].lower()
 
 	return json.dumps(json_domains, indent=4, sort_keys=True)
 
 
 def generate_csv(domains):
-	output = 'fuzzer,domain-name,dns-a,dns-aaaa,dns-mx,dns-ns,geoip-country,whois-created,whois-updated,ssdeep-score\n'
+	output = 'fuzzer,domainname,dns-a,dns-aaaa,dns-mx,dns-ns,geoip-country,whois-created,whois-updated,ssdeep-score\n'
 
 	for domain in domains:
 		output += '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' % (domain.get('fuzzer'),
-			domain.get('domain-name').encode('idna'),
+			domain.get('domainname').encode('idna'),
 			one_or_all(domain.get('dns-a', [''])),
 			one_or_all(domain.get('dns-aaaa', [''])),
 			one_or_all(domain.get('dns-mx', [''])),
@@ -741,7 +741,7 @@ def generate_idle(domains):
 	output = ''
 
 	for domain in domains:
-		output += '%s\n' % domain.get('domain-name').encode('idna')
+		output += '%s\n' % domain.get('domainname').encode('idna')
 
 	return output
 
@@ -750,7 +750,7 @@ def generate_cli(domains):
 	output = ''
 
 	width_fuzzer = max([len(d['fuzzer']) for d in domains]) + 1
-	width_domain = max([len(d['domain-name']) for d in domains]) + 1
+	width_domain = max([len(d['domainname']) for d in domains]) + 1
 
 	for domain in domains:
 		info = ''
@@ -797,7 +797,7 @@ def generate_cli(domains):
 		if not info:
 			info = '-'
 
-		output += '%s%s%s %s %s\n' % (FG_BLU, domain['fuzzer'].ljust(width_fuzzer), FG_RST, domain['domain-name'].ljust(width_domain), info)
+		output += '%s%s%s %s %s\n' % (FG_BLU, domain['fuzzer'].ljust(width_fuzzer), FG_RST, domain['domainname'].ljust(width_domain), info)
 
 	return output
 
@@ -816,6 +816,7 @@ def main():
 
 	parser.add_argument('domain', help='domain name or URL to check')
 	parser.add_argument('-a', '--all', action='store_true', help='show all DNS records')
+	parser.add_argument('-l', '--list', action='store_true', help='list all the possible phishing domains')
 	parser.add_argument('-b', '--banners', action='store_true', help='determine HTTP and SMTP service banners')
 	parser.add_argument('-d', '--dictionary', type=str, metavar='FILE', help='generate additional domains using dictionary FILE')
 	parser.add_argument('-g', '--geoip', action='store_true', help='perform lookup for GeoIP location')
@@ -848,6 +849,10 @@ def main():
 	dfuzz = DomainFuzz(url.domain)
 	dfuzz.generate()
 	domains = dfuzz.domains
+
+	if args.list == True:
+		print json.dumps(domains)
+		sys.exit()
 
 	if args.dictionary:
 		if not path.exists(args.dictionary):
